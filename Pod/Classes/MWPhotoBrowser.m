@@ -58,7 +58,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     } else {
         _isVCBasedStatusBarAppearance = YES; // default
     }
-    self.hidesBottomBarWhenPushed = YES;
+    // self.hidesBottomBarWhenPushed = YES;
     _hasBelongedToViewController = NO;
     _photoCount = NSNotFound;
     _previousLayoutBounds = CGRectZero;

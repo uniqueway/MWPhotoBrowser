@@ -59,7 +59,12 @@ static const CGFloat labelPadding = 10;
 
     _label.numberOfLines = 0;
     _label.textColor = [UIColor whiteColor];
-    _label.font = [UIFont systemFontOfSize:17];
+    
+    CGFloat multiple = 320 / UIScreen.mainScreen.bounds.size.width;
+    CGFloat size = 15 * multiple;
+    
+    
+    _label.font = [UIFont systemFontOfSize:size];
     if ([_photo respondsToSelector:@selector(caption)]) {
         _label.text = [_photo caption] ? [_photo caption] : @" ";
     }

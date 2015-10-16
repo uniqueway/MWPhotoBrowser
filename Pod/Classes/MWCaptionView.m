@@ -26,11 +26,12 @@ static const CGFloat labelPadding = 10;
     if (self) {
         self.userInteractionEnabled = NO;
         _photo = photo;
-        self.barStyle = UIBarStyleBlackTranslucent;
-        self.tintColor = nil;
-        self.barTintColor = nil;
-        self.barStyle = UIBarStyleBlackTranslucent;
-        [self setBackgroundImage:nil forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+//        self.barStyle = UIBarStyleBlackOpaque;
+//        self.tintColor = nil;
+//        self.barTintColor = nil;
+//        self.barStyle = UIBarStyleBlackOpaque;
+//        [self setBackgroundImage:nil forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+        self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.6];
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin;
         [self setupCaption];
     }

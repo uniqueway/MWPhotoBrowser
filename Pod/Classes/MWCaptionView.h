@@ -11,6 +11,10 @@
 
 @interface MWCaptionView : UIView
 
+@property (nonatomic, weak)id <MWPhoto> photo;
+@property (nonatomic, strong) UILabel *label;
+
+
 // Init
 - (id)initWithPhoto:(id<MWPhoto>)photo;
 

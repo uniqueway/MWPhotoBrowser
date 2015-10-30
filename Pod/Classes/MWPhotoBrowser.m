@@ -509,9 +509,9 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 	for (MWZoomingScrollView *page in _visiblePages) {
         NSUInteger index = page.index;
 		page.frame = [self frameForPageAtIndex:index];
-        if (page.captionView) {
-            page.captionView.frame = [self frameForCaptionView:page.captionView atIndex:index];
-        }
+//        if (page.captionView) {
+//            page.captionView.frame = [self frameForCaptionView:page.captionView atIndex:index];
+//        }
         if (page.selectedButton) {
             page.selectedButton.frame = [self frameForSelectedButton:page.selectedButton atIndex:index];
         }
@@ -680,7 +680,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
             if ([photo caption]) captionView = [[MWCaptionView alloc] initWithPhoto:photo];
         }
     }
-    captionView.alpha = [self areControlsHidden] ? 0 : 1; // Initial alpha
+//    captionView.alpha = [self areControlsHidden] ? 0 : 1; // Initial alpha
     return captionView;
 }
 
@@ -768,8 +768,8 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 	// Ignore padding as paging bounces encroach on that
 	// and lead to false page loads
 	CGRect visibleBounds = _pagingScrollView.bounds;
-	NSInteger iFirstIndex = (NSInteger)floorf((CGRectGetMinX(visibleBounds)+PADDING*2) / CGRectGetWidth(visibleBounds));
-	NSInteger iLastIndex  = (NSInteger)floorf((CGRectGetMaxX(visibleBounds)-PADDING*2-1) / CGRectGetWidth(visibleBounds));
+	NSInteger iFirstIndex = (NSInteger)floorf((CGRectGetMinX(visibleBounds)) / CGRectGetWidth(visibleBounds));
+	NSInteger iLastIndex  = (NSInteger)floorf((CGRectGetMaxX(visibleBounds)-1) / CGRectGetWidth(visibleBounds));
     if (iFirstIndex < 0) iFirstIndex = 0;
     if (iFirstIndex > [self numberOfPhotos] - 1) iFirstIndex = [self numberOfPhotos] - 1;
     if (iLastIndex < 0) iLastIndex = 0;
@@ -809,13 +809,12 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 			MWLog(@"Added page at index %lu", (unsigned long)index);
             
             // Add caption
-            MWCaptionView *captionView = [self captionViewForPhotoAtIndex:index];
-            if (captionView) {
-                captionView.frame = [self frameForCaptionView:captionView atIndex:index];
-                captionView.hidden = YES;
-                [self.view addSubview:captionView];
-                page.captionView = captionView;
-            }
+//            MWCaptionView *captionView = [self captionViewForPhotoAtIndex:index];
+//            if (captionView) {
+//                captionView.frame = [self frameForCaptionView:captionView atIndex:index];
+//                [_pagingScrollView addSubview:captionView];
+//                page.captionView = captionView;
+//            }
             
             // Add play button if needed
             if (page.displayingVideo) {
@@ -967,9 +966,9 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 #pragma mark - Frame Calculations
 
 - (CGRect)frameForPagingScrollView {
-    CGRect frame = self.view.bounds;// [[UIScreen mainScreen] bounds];
-    frame.origin.x -= PADDING;
-    frame.size.width += (2 * PADDING);
+    CGRect frame = [[UIScreen mainScreen] bounds];
+//    frame.origin.x -= PADDING;
+//    frame.size.width += (2 * PADDING);
     return CGRectIntegral(frame);
 }
 
@@ -980,8 +979,8 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     // because it has a rotation transform applied.
     CGRect bounds = _pagingScrollView.bounds;
     CGRect pageFrame = bounds;
-    pageFrame.size.width -= (2 * PADDING);
-    pageFrame.origin.x = (bounds.size.width * index) + PADDING;
+//    pageFrame.size.width -= (2 * PADDING);
+    pageFrame.origin.x = (bounds.size.width * index);
     return CGRectIntegral(pageFrame);
 }
 
@@ -1089,13 +1088,9 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
             self.title = [NSString stringWithFormat:@"%lu %@", (unsigned long)numberOfPhotos, photosText];
         }
     } else if (numberOfPhotos > 1) {
-    
-        for (MWZoomingScrollView *page in _visiblePages) {
-            page.captionView.hidden = !(page.index == _currentPageIndex);
-        }
+        
         if ([_delegate respondsToSelector:@selector(photoBrowser:titleForPhotoAtIndex:)]) {
             self.title = [_delegate photoBrowser:self titleForPhotoAtIndex:_currentPageIndex];
-            
         } else {
             self.title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(_currentPageIndex+1), NSLocalizedString(@"of", @"Used in the context: 'Showing 1 of 3 items'"), (unsigned long)numberOfPhotos];
         }
@@ -1117,6 +1112,17 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         _actionButton.tintColor = nil;
     }
 	
+    
+    [_floatCaptionView removeFromSuperview];
+    _floatCaptionView = [self captionViewForPhotoAtIndex:_currentPageIndex];
+    if (_floatCaptionView) {
+        //            CGSize captionSize = [_floatCaptionView sizeThatFits:CGSizeMake(UIScreen.mainScreen.bounds.size.width, 0)];
+        //            CGFloat y = _pagingScrollView.frame.size.height - captionSize.height;
+        _floatCaptionView.frame = (CGRect){0,UIScreen.mainScreen.bounds.size.height-20,UIScreen.mainScreen.bounds.size.width,20};
+        [self.view addSubview:_floatCaptionView];
+    }
+
+    
 }
 
 - (void)jumpToPageAtIndex:(NSUInteger)index animated:(BOOL)animated {
@@ -1124,7 +1130,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 	// Change page
 	if (index < [self numberOfPhotos]) {
 		CGRect pageFrame = [self frameForPageAtIndex:index];
-        [_pagingScrollView setContentOffset:CGPointMake(pageFrame.origin.x - PADDING, 0) animated:animated];
+        [_pagingScrollView setContentOffset:CGPointMake(pageFrame.origin.x, 0) animated:animated];
 		[self updateNavigation];
 	}
 	
@@ -1421,11 +1427,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         // Captions
         for (MWZoomingScrollView *page in _visiblePages) {
             if (page.captionView) {
-                MWCaptionView *v = page.captionView;
-                // Pass any index, all we're interested in is the Y
-                CGRect captionFrame = [self frameForCaptionView:v atIndex:0];
-                captionFrame.origin.x = v.frame.origin.x; // Reset X
-                v.frame = CGRectOffset(captionFrame, 0, animatonOffset);
+//                MWCaptionView *v = page.captionView;
+//                // Pass any index, all we're interested in is the Y
+//                CGRect captionFrame = [self frameForCaptionView:v atIndex:0];
+//                captionFrame.origin.x = v.frame.origin.x; // Reset X
+//                v.frame = CGRectOffset(captionFrame, 0, animatonOffset);
             }
         }
         
@@ -1445,13 +1451,13 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         // Captions
         for (MWZoomingScrollView *page in _visiblePages) {
             if (page.captionView) {
-                MWCaptionView *v = page.captionView;
-                // Pass any index, all we're interested in is the Y
-                CGRect captionFrame = [self frameForCaptionView:v atIndex:0];
-                captionFrame.origin.x = v.frame.origin.x; // Reset X
-                if (hidden) captionFrame = CGRectOffset(captionFrame, 0, animatonOffset);
-                v.frame = captionFrame;
-                v.alpha = alpha;
+//                MWCaptionView *v = page.captionView;
+//                // Pass any index, all we're interested in is the Y
+//                CGRect captionFrame = [self frameForCaptionView:v atIndex:0];
+//                captionFrame.origin.x = v.frame.origin.x; // Reset X
+//                if (hidden) captionFrame = CGRectOffset(captionFrame, 0, animatonOffset);
+//                v.frame = captionFrame;
+//                v.alpha = alpha;
             }
         }
         
@@ -1572,11 +1578,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         } else {
             
             // Show activity view controller
-            NSMutableArray *items = [NSMutableArray arrayWithObject:[photo underlyingImage]];
-            if (photo.caption) {
-                [items addObject:photo.caption];
-            }
-            self.activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
+//            NSMutableArray *items = [NSMutableArray arrayWithObject:[photo underlyingImage]];
+//            if (photo.caption) {
+//                [items addObject:photo.caption];
+//            }
+//            self.activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
             
             // Show loading spinner after a couple of seconds
             double delayInSeconds = 2.0;

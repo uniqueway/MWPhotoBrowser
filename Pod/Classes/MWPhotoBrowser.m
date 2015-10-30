@@ -812,7 +812,8 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
             MWCaptionView *captionView = [self captionViewForPhotoAtIndex:index];
             if (captionView) {
                 captionView.frame = [self frameForCaptionView:captionView atIndex:index];
-                [_pagingScrollView addSubview:captionView];
+                captionView.hidden = YES;
+                [self.view addSubview:captionView];
                 page.captionView = captionView;
             }
             
@@ -1088,8 +1089,13 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
             self.title = [NSString stringWithFormat:@"%lu %@", (unsigned long)numberOfPhotos, photosText];
         }
     } else if (numberOfPhotos > 1) {
+    
+        for (MWZoomingScrollView *page in _visiblePages) {
+            page.captionView.hidden = !(page.index == _currentPageIndex);
+        }
         if ([_delegate respondsToSelector:@selector(photoBrowser:titleForPhotoAtIndex:)]) {
             self.title = [_delegate photoBrowser:self titleForPhotoAtIndex:_currentPageIndex];
+            
         } else {
             self.title = [NSString stringWithFormat:@"%lu %@ %lu", (unsigned long)(_currentPageIndex+1), NSLocalizedString(@"of", @"Used in the context: 'Showing 1 of 3 items'"), (unsigned long)numberOfPhotos];
         }

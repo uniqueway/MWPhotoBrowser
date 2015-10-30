@@ -14,7 +14,7 @@
 
 // Declare private methods of browser
 @interface MWPhotoBrowser () {
-    MWCaptionView *_floatCaptionView;
+    UIView *_floatCaptionView;
 	// Data
     NSUInteger _photoCount;
     NSMutableArray *_photos;
